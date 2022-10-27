@@ -19,13 +19,20 @@ async function serveHttp(conn: Deno.Conn) {
         // objects.
         const { pathname } = new URLPattern(requestEvent.request.url)
         
+        const githubUrl = `https://raw.githubusercontent.com/pagoru/physics-preview/master/bundle/`;
+        
+        const isProd = Deno.env.get('environment') === 'production';
         let body;
         switch (pathname) {
             case '/':
-                body = Deno.readFileSync('./bundle/index.html')
+                body = isProd
+                    ? (await (await fetch(`${githubUrl}index.html`)).body)
+                    : Deno.readFileSync('./bundle/index.html')
                 break;
             case '/bundle.js':
-                body = Deno.readFileSync('./bundle/bundle.js')
+                body = isProd
+                    ? (await (await fetch(`${githubUrl}bundle.js`)).body)
+                    : Deno.readFileSync('./bundle/bundle.js')
                 break;
         }
         
