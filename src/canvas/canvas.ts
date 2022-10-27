@@ -5,7 +5,7 @@ import {World} from "world/world";
 export const Canvas = (() => {
     
     let app: PIXI.Application;
-    const scale = .5;
+    const scale = 2;
     
     const load = () => {
         

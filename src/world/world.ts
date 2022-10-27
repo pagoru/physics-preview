@@ -11,7 +11,7 @@ export const World = (() => {
         world.sleepMode = P2.World.BODY_SLEEPING;
     
         Canvas.getApp().ticker.add((delta) => {
-            world?.step(1 / 60, delta, 40);
+            world?.step(1 / 60, delta, 10);
         });
     }
     
