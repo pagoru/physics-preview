@@ -15,30 +15,35 @@ async function serveHttp(conn: Deno.Conn) {
     // Each request sent over the HTTP connection will be yielded as an async
     // iterator from the HTTP connection.
     for await (const requestEvent of httpConn) {
-        // The native HTTP server uses the web standard `Request` and `Response`
-        // objects.
-        const { pathname } = new URLPattern(requestEvent.request.url)
-        
-        const githubUrl = `https://raw.githubusercontent.com/pagoru/physics-preview/master/bundle/`;
-        
-        const isProd = Deno.env.get('environment') === 'production';
-        let body;
-        switch (pathname) {
-            case '/':
-                body = isProd
-                    ? (await (await fetch(`${githubUrl}index.html`)).body)
-                    : Deno.readFileSync('./bundle/index.html')
-                break;
-            case '/bundle.js':
-                body = isProd
-                    ? (await (await fetch(`${githubUrl}bundle.js`)).body)
-                    : Deno.readFileSync('./bundle/bundle.js')
-                break;
+        try {
+    
+            // The native HTTP server uses the web standard `Request` and `Response`
+            // objects.
+            const { pathname } = new URLPattern(requestEvent.request.url)
+    
+            const githubUrl = `https://raw.githubusercontent.com/pagoru/physics-preview/master/bundle/`;
+    
+            const isProd = Deno.env.get('environment') === 'production';
+            let body;
+            switch (pathname) {
+                case '/':
+                    body = isProd
+                        ? (await (await fetch(`${githubUrl}index.html`)).body)
+                        : Deno.readFileSync('./bundle/index.html')
+                    break;
+                case '/bundle.js':
+                    body = isProd
+                        ? (await (await fetch(`${githubUrl}bundle.js`)).body)
+                        : Deno.readFileSync('./bundle/bundle.js')
+                    break;
+            }
+    
+            if(!body)
+                return await requestEvent.respondWith(new Response('404', { status: 404 }))
+    
+            await requestEvent.respondWith(new Response(body));
+        } catch (e) {
+            
         }
-        
-        if(!body)
-            return await requestEvent.respondWith(new Response('404', { status: 404 }))
-        
-        await requestEvent.respondWith(new Response(body));
     }
 }
