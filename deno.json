@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "start": "deno run -A main.ts & deno run -A --watch=src/ bundle.ts"
+  },
+  "importMap": "./import_map.json"
+}
