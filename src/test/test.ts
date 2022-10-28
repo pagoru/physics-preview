@@ -13,7 +13,7 @@ export const Test = (() => {
     
         const newBody = () => {
             const body = new P2.Body({
-                mass: 2000,
+                mass: 850,
                 position: [0, 0],
             });
             body.id = Utils.id.getUID();
@@ -36,7 +36,10 @@ export const Test = (() => {
         const chassisBody = newBody();
 
         var boxShape = new P2.Box({ width: 10, height: 20 });
+        boxShape.centerOfMass = [0, 5]
         chassisBody.addShape(boxShape);
+        // chassisBody.adjustCenterOfMass()
+
         world.addBody(chassisBody);
 
         // Create the vehicle
@@ -46,21 +49,21 @@ export const Test = (() => {
         var frontWheel1 = vehicle.addWheel({
             localPosition: [-5, 10] // front
         });
-        frontWheel1.setSideFriction(5);
+        frontWheel1.setSideFriction(1);
         var frontWheel2 = vehicle.addWheel({
             localPosition: [5, 10] // front
         });
-        frontWheel2.setSideFriction(5);
+        frontWheel2.setSideFriction(1);
 
         // Back wheel
         var backWheel1 = vehicle.addWheel({
             localPosition: [-5, -10] // back
         });
-        backWheel1.setSideFriction(5); // Less side friction on back wheel makes it easier to drift
+        backWheel1.setSideFriction(50); // Less side friction on back wheel makes it easier to drift
         var backWheel2 = vehicle.addWheel({
             localPosition: [5, -10] // back
         });
-        backWheel2.setSideFriction(5); // Less side friction on back wheel makes it easier to drift
+        backWheel2.setSideFriction(50); // Less side friction on back wheel makes it easier to drift
         vehicle.addToWorld(world);
     
         
@@ -74,7 +77,7 @@ export const Test = (() => {
         frontWheel2.engineForce = 0;
         // backWheel2.setBrakeForce(1);
 
-        const MAX_DEGREE = 30;
+        const MAX_DEGREE = 20;
         let degreeSteer = 0;
 
         const steer = (degree: number) => {
@@ -96,24 +99,12 @@ export const Test = (() => {
         window.addEventListener('keyup', ({ code }) => {
             keyCodeDown[code] = false;
         }, false);
-    
-        world.on('postStep', event => {
-            const awakeBodies = world.bodies.filter(
-                body =>
-                    body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
-            );
-            awakeBodies.forEach((body) => {
-    
-                const graphics = stage.getChildByName(`body::${body.id}`);
-                graphics.position.set(body.position[0], body.position[1])
-                graphics.rotation = body.angle;
-                
-            });
 
+        Canvas.getApp().ticker.add((delta) => {
             if(keyCodeDown['KeyW']) {
-                if(frontWheel1.engineForce > 500) return;
-                frontWheel1.engineForce += 1;
-                frontWheel2.engineForce += 1;
+                if(frontWheel1.engineForce > 1500) return;
+                frontWheel1.engineForce += 2;
+                frontWheel2.engineForce += 2;
             } else {
                 frontWheel1.engineForce = 0;
                 frontWheel2.engineForce = 0;
@@ -127,11 +118,32 @@ export const Test = (() => {
                 frontWheel2.engineForce = 0;
             }
             if(keyCodeDown['KeyD']) {
-                steer(.0125)
+                steer(.25)
             }
             if(keyCodeDown['KeyA']) {
-                steer(-.0125)
+                if(degreeSteer > 0)
+                    degreeSteer = 0;
+                steer(-.25)
             }
+
+            if(!keyCodeDown['KeyD'] && !keyCodeDown['KeyA']) {
+                degreeSteer = 0;
+                steer(0)
+            }
+        });
+    
+        world.on('postStep', event => {
+            const awakeBodies = world.bodies.filter(
+                body =>
+                    body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
+            );
+            awakeBodies.forEach((body) => {
+    
+                const graphics = stage.getChildByName(`body::${body.id}`);
+                graphics.position.set(body.position[0], body.position[1])
+                graphics.rotation = body.angle;
+            });
+
         });
     }
     
