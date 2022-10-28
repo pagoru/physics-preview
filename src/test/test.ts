@@ -32,16 +32,49 @@ export const Test = (() => {
             world.addBody(body);
             return body;
         }
-        
+
+        (() => {
+            const chassisBody = newBody();
+            chassisBody.position = [80, 160]
+
+            var boxShape = new P2.Box({ width: 10, height: 20 });
+            chassisBody.addShape(boxShape);
+            world.addBody(chassisBody);
+
+            // Create the vehicle
+            var vehicle = new P2.TopDownVehicle(chassisBody);
+
+            // Add one front wheel and one back wheel - we don't actually need four :)
+            var frontWheel1 = vehicle.addWheel({
+                localPosition: [-5, 10] // front
+            });
+            frontWheel1.setSideFriction(2);
+            var frontWheel2 = vehicle.addWheel({
+                localPosition: [5, 10] // front
+            });
+            frontWheel2.setSideFriction(2);
+
+            // Back wheel
+            var backWheel1 = vehicle.addWheel({
+                localPosition: [-5, -10] // back
+            });
+            backWheel1.setSideFriction(5); // Less side friction on back wheel makes it easier to drift
+            var backWheel2 = vehicle.addWheel({
+                localPosition: [5, -10] // back
+            });
+            backWheel2.setSideFriction(5); // Less side friction on back wheel makes it easier to drift
+            vehicle.addToWorld(world);
+        })();
+
         const chassisBody = newBody();
-        
+
         var boxShape = new P2.Box({ width: 10, height: 20 });
         chassisBody.addShape(boxShape);
         world.addBody(chassisBody);
-    
+
         // Create the vehicle
         var vehicle = new P2.TopDownVehicle(chassisBody);
-    
+
         // Add one front wheel and one back wheel - we don't actually need four :)
         var frontWheel1 = vehicle.addWheel({
             localPosition: [-5, 10] // front
@@ -51,7 +84,7 @@ export const Test = (() => {
             localPosition: [5, 10] // front
         });
         frontWheel2.setSideFriction(2);
-    
+
         // Back wheel
         var backWheel1 = vehicle.addWheel({
             localPosition: [-5, -10] // back
