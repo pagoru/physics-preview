@@ -13,7 +13,7 @@ export const Test = (() => {
     
         const newBody = () => {
             const body = new P2.Body({
-                mass: 1,
+                mass: 2000,
                 position: [0, 0],
             });
             body.id = Utils.id.getUID();
@@ -33,39 +33,6 @@ export const Test = (() => {
             return body;
         }
 
-        (() => {
-            const chassisBody = newBody();
-            chassisBody.position = [80, 160]
-
-            var boxShape = new P2.Box({ width: 10, height: 20 });
-            chassisBody.addShape(boxShape);
-            world.addBody(chassisBody);
-
-            // Create the vehicle
-            var vehicle = new P2.TopDownVehicle(chassisBody);
-
-            // Add one front wheel and one back wheel - we don't actually need four :)
-            var frontWheel1 = vehicle.addWheel({
-                localPosition: [-5, 10] // front
-            });
-            frontWheel1.setSideFriction(2);
-            var frontWheel2 = vehicle.addWheel({
-                localPosition: [5, 10] // front
-            });
-            frontWheel2.setSideFriction(2);
-
-            // Back wheel
-            var backWheel1 = vehicle.addWheel({
-                localPosition: [-5, -10] // back
-            });
-            backWheel1.setSideFriction(5); // Less side friction on back wheel makes it easier to drift
-            var backWheel2 = vehicle.addWheel({
-                localPosition: [5, -10] // back
-            });
-            backWheel2.setSideFriction(5); // Less side friction on back wheel makes it easier to drift
-            vehicle.addToWorld(world);
-        })();
-
         const chassisBody = newBody();
 
         var boxShape = new P2.Box({ width: 10, height: 20 });
@@ -79,11 +46,11 @@ export const Test = (() => {
         var frontWheel1 = vehicle.addWheel({
             localPosition: [-5, 10] // front
         });
-        frontWheel1.setSideFriction(2);
+        frontWheel1.setSideFriction(5);
         var frontWheel2 = vehicle.addWheel({
             localPosition: [5, 10] // front
         });
-        frontWheel2.setSideFriction(2);
+        frontWheel2.setSideFriction(5);
 
         // Back wheel
         var backWheel1 = vehicle.addWheel({
@@ -106,36 +73,28 @@ export const Test = (() => {
         frontWheel1.engineForce = 0;
         frontWheel2.engineForce = 0;
         // backWheel2.setBrakeForce(1);
-    
-        
-    
+
+        const MAX_DEGREE = 30;
+        let degreeSteer = 0;
+
+        const steer = (degree: number) => {
+            degreeSteer += degree;
+
+            if(degreeSteer > MAX_DEGREE) degreeSteer = MAX_DEGREE;
+            if(degreeSteer < - MAX_DEGREE) degreeSteer = - MAX_DEGREE;
+
+            const radians = (degreeSteer * Math.PI) / 180.0;
+            frontWheel1.steerValue = radians;
+            frontWheel2.steerValue = radians;
+        }
+
+        const keyCodeDown = {};
+
         window.addEventListener('keydown', ({ code }) => {
-            switch (code) {
-                case 'KeyW':
-                    frontWheel1.engineForce += .1;
-                    frontWheel2.engineForce += .1;
-                    break;
-                case 'KeyS':
-                    frontWheel1.engineForce = 0;
-                    frontWheel2.engineForce = 0;
-                    // frontWheel1.setBrakeForce(1)
-                    // frontWheel2.setBrakeForce(1)
-                    // backWheel1.setBrakeForce(1)
-                    // backWheel2.setBrakeForce(1)
-                    break;
-                case 'KeyD':
-                    frontWheel1.steerValue += .01;
-                    frontWheel2.steerValue += .01;
-                    break;
-                case 'KeyA':
-                    frontWheel1.steerValue -= .01;
-                    frontWheel2.steerValue -= .01;
-                    break;
-            }
-            console.log(code)
+            keyCodeDown[code] = true;
         }, false);
-        window.addEventListener('keyup', ({ key }) => {
-    
+        window.addEventListener('keyup', ({ code }) => {
+            keyCodeDown[code] = false;
         }, false);
     
         world.on('postStep', event => {
@@ -143,8 +102,6 @@ export const Test = (() => {
                 body =>
                     body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
             );
-            if(awakeBodies.length === 0) return;
-    
             awakeBodies.forEach((body) => {
     
                 const graphics = stage.getChildByName(`body::${body.id}`);
@@ -152,6 +109,29 @@ export const Test = (() => {
                 graphics.rotation = body.angle;
                 
             });
+
+            if(keyCodeDown['KeyW']) {
+                if(frontWheel1.engineForce > 500) return;
+                frontWheel1.engineForce += 1;
+                frontWheel2.engineForce += 1;
+            } else {
+                frontWheel1.engineForce = 0;
+                frontWheel2.engineForce = 0;
+                frontWheel1.setBrakeForce(5)
+                frontWheel2.setBrakeForce(5)
+                backWheel1.setBrakeForce(3)
+                backWheel2.setBrakeForce(3)
+            }
+            if(keyCodeDown['KeyS']) {
+                frontWheel1.engineForce = 0;
+                frontWheel2.engineForce = 0;
+            }
+            if(keyCodeDown['KeyD']) {
+                steer(.0125)
+            }
+            if(keyCodeDown['KeyA']) {
+                steer(-.0125)
+            }
         });
     }
     
