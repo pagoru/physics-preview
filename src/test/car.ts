@@ -139,13 +139,13 @@ export const Car = (world, stage) => {
             
             if(frontWheel1.engineForce < 1500) {
     
-                frontWheel1.engineForce += 4;
-                frontWheel2.engineForce += 4;
+                frontWheel1.engineForce += 1;
+                frontWheel2.engineForce += 1;
             }
         } else {
-            if(frontWheel1.engineForce - 6 > 0) {
-                frontWheel1.engineForce -= 6;
-                frontWheel2.engineForce -= 6;
+            if(frontWheel1.engineForce - 1 > 0) {
+                frontWheel1.engineForce -= 1;
+                frontWheel2.engineForce -= 1;
             }
         }
         if(keyCodeDown['Space']) {
