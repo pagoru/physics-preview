@@ -106,7 +106,7 @@ export const Car = (world, stage) => {
         
         if(degreeSteer > MAX_DEGREE) degreeSteer = MAX_DEGREE;
         if(degreeSteer < - MAX_DEGREE) degreeSteer = - MAX_DEGREE;
-        
+
         const achernamRadians = getRadiansFromDegree(getAchermanDegree(
             degreeSteer,
             frontWheel1.localPosition,
@@ -115,6 +115,7 @@ export const Car = (world, stage) => {
             backWheel2.localPosition
         ));
         const radians = getRadiansFromDegree(degree);
+        // const achernamRadians = radians;
     
         frontWheel1.steerValue = degree > 0 ? radians : achernamRadians
         frontWheel2.steerValue = degree > 0 ? achernamRadians : radians;
@@ -142,22 +143,44 @@ export const Car = (world, stage) => {
                 frontWheel2.engineForce += 4;
             }
         } else {
-            if(frontWheel1.engineForce - .25 < 0) {
-                frontWheel1.engineForce -= -.25;
-                frontWheel2.engineForce -= -.25;
+            if(frontWheel1.engineForce - 6 > 0) {
+                frontWheel1.engineForce -= 6;
+                frontWheel2.engineForce -= 6;
             }
         }
+        if(keyCodeDown['Space']) {
+            frontWheel1.engineForce = 0;
+            frontWheel2.engineForce = 0;
+            frontWheel1.setBrakeForce(100)
+            frontWheel2.setBrakeForce(100)
+            backWheel1.setBrakeForce(100)
+            backWheel2.setBrakeForce(100)
+        }
         if(keyCodeDown['KeyS']) {
-            frontWheel1.setBrakeForce(300)
-            frontWheel2.setBrakeForce(300)
+
+            frontWheel1.setBrakeForce(0)
+            frontWheel2.setBrakeForce(0)
+            backWheel1.setBrakeForce(0)
+            backWheel2.setBrakeForce(0)
+
+            if(frontWheel1.engineForce > -1000) {
+
+                frontWheel1.engineForce -= 3;
+                frontWheel2.engineForce -= 3;
+            }
+        } else {
+            if(frontWheel1.engineForce + 2 < 0) {
+                frontWheel1.engineForce = 2;
+                frontWheel2.engineForce = 2;
+            }
         }
         if(keyCodeDown['KeyD']) {
-            steer(5)
+            steer(7.5)
         }
         if(keyCodeDown['KeyA']) {
             if(degreeSteer > 0)
                 degreeSteer = 0;
-            steer(-5)
+            steer(-7.5)
         }
         
         if(!keyCodeDown['KeyD'] && !keyCodeDown['KeyA']) {
