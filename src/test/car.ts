@@ -7,7 +7,7 @@ export const Car = (world, stage) => {
     
     const getRadiansFromDegree = (degree: number) => (degree * Math.PI) / 180.0;
     
-    const getAchermanDegree = (
+    const getAckermannDegree = (
         degree: number,
         [front1X, front1Y]: [number, number],
         [front2X, front2Y]: [number, number],
@@ -107,7 +107,7 @@ export const Car = (world, stage) => {
         if(degreeSteer > MAX_DEGREE) degreeSteer = MAX_DEGREE;
         if(degreeSteer < - MAX_DEGREE) degreeSteer = - MAX_DEGREE;
 
-        const achernamRadians = getRadiansFromDegree(getAchermanDegree(
+        const achernamRadians = getRadiansFromDegree(getAckermannDegree(
             degreeSteer,
             frontWheel1.localPosition,
             frontWheel2.localPosition,

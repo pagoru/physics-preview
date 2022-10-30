@@ -1,7 +1,9 @@
 import {Canvas} from "canvas/canvas";
 import {World} from "world/world";
 import * as P2 from "p2";
-import {Car} from "test/car";
+import {carBody} from "test/car-body";
+import * as PIXI from "pixi.mjs";
+import {Utils} from "utils/utils";
 
 export const Test = (() => {
     
@@ -10,9 +12,107 @@ export const Test = (() => {
         const { stage } = Canvas.getApp();
         const world = World.getWorld();
     
-        Car(world, stage);
+        
+        const {
+            getBody,
+            getVehicle,
+            getFrontWheels,
+            getRearWheels,
+            getWheels,
+            steerFrontWheels
+        } = carBody({
+            mass: 850,
+            centerOfMass: 10,
+            
+            width: 20,
+            height: 40,
+            
+            maxSteerDegree: 45,
+            
+            frontWheelAxle: 15,
+            rearWheelAxle: -15,
+            ackermannAxle: -15
+        });
+    
+        getVehicle().addToWorld(world);
+        const body = getBody();
+        body.allowSleep = false;
+        body.sleepSpeedLimit = 1;
+        body.sleepTimeLimit = 1;
+        world.addBody(body);
+    
+        const vehicleGraph = new PIXI.Graphics();
+        vehicleGraph.name = `body::${body.id}`
+        vehicleGraph.beginFill(Utils.color.getRandomColor());
+        vehicleGraph.drawPolygon([-10, -20, 10, -20, 10, 20, -10, 20]);
+        vehicleGraph.endFill();
     
         
+        const wheelPolygon = [-2, -4, 2, -4, 2, 4, -2, 4];
+        
+        const frontLeftWheel = new PIXI.Graphics();
+        frontLeftWheel.beginFill(Utils.color.getRandomColor());
+        frontLeftWheel.drawPolygon(wheelPolygon);
+        frontLeftWheel.endFill();
+        frontLeftWheel.position.set(-10, 15)
+    
+        const frontRightWheel = new PIXI.Graphics();
+        frontRightWheel.beginFill(Utils.color.getRandomColor());
+        frontRightWheel.drawPolygon(wheelPolygon);
+        frontRightWheel.endFill();
+        frontRightWheel.position.set(10, 15)
+    
+        vehicleGraph.addChild(frontLeftWheel, frontRightWheel);
+    
+        stage.addChild(vehicleGraph);
+        
+        const keyCodeDown = {};
+        window.addEventListener('keydown', ({ code }) => {
+            keyCodeDown[code] = true;
+        }, false);
+        window.addEventListener('keyup', ({ code }) => {
+            keyCodeDown[code] = false;
+        }, false);
+    
+        Canvas.getApp().ticker.add((delta) => {
+            if(keyCodeDown['KeyW']) {
+                getWheels().forEach(wheel => {
+                    wheel.setBrakeForce(0)
+                    wheel.setSideFriction(100)
+                })
+                getFrontWheels().forEach(wheel => {
+                    wheel.engineForce += 2;
+                });
+            } else {
+                getFrontWheels().forEach(wheel => {
+                    if(wheel.engineForce > 0) return;
+                    wheel.engineForce -= 1;
+                });
+            }
+    
+            if(keyCodeDown['KeyS']) {
+                getWheels().forEach(wheel => {
+                    // wheel.setBrakeForce(100)
+                })
+                getFrontWheels().forEach(wheel => {
+                    wheel.engineForce = 0;
+                });
+            }
+    
+            if(keyCodeDown['KeyD']) {
+                steerFrontWheels(1)
+                const [leftWheel, rightWheel] = getFrontWheels();
+                frontLeftWheel.rotation = leftWheel.steerValue;
+                frontRightWheel.rotation = rightWheel.steerValue;
+            }
+    
+            if(keyCodeDown['KeyA']) {
+                steerFrontWheels(-1)
+                const [leftWheel, rightWheel] = getFrontWheels();
+                frontLeftWheel.rotation = leftWheel.steerValue;
+                frontRightWheel.rotation = rightWheel.steerValue;
+            }
+        });
     
         world.on('postStep', event => {
             const awakeBodies = world.bodies.filter(
@@ -20,12 +120,10 @@ export const Test = (() => {
                     body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
             );
             awakeBodies.forEach((body) => {
-            
                 const graphics = stage.getChildByName(`body::${body.id}`);
                 graphics.position.set(body.position[0], body.position[1])
                 graphics.rotation = body.angle;
             });
-        
         });
     }
     
