@@ -66,6 +66,10 @@ export const Test = (() => {
     
         stage.addChild(vehicleGraph);
         
+        getWheels().forEach(wheel => {
+            wheel.setSideFriction(200)
+        })
+        
         const keyCodeDown = {};
         window.addEventListener('keydown', ({ code }) => {
             keyCodeDown[code] = true;
@@ -77,25 +81,28 @@ export const Test = (() => {
         Canvas.getApp().ticker.add((delta) => {
             if(keyCodeDown['KeyW']) {
                 getWheels().forEach(wheel => {
-                    wheel.setBrakeForce(0)
-                    wheel.setSideFriction(100)
+                    wheel.setBrakeForce((wheel.engineForce < 0) ? 100 : 0);
                 })
                 getFrontWheels().forEach(wheel => {
-                    wheel.engineForce += 2;
-                });
-            } else {
-                getFrontWheels().forEach(wheel => {
-                    if(wheel.engineForce > 0) return;
-                    wheel.engineForce -= 1;
+                    wheel.engineForce += (wheel.engineForce < 0) ? 6 : 2;
                 });
             }
     
             if(keyCodeDown['KeyS']) {
                 getWheels().forEach(wheel => {
-                    // wheel.setBrakeForce(100)
+                    wheel.setBrakeForce((wheel.engineForce > 0) ? 100 : 0);
                 })
                 getFrontWheels().forEach(wheel => {
-                    wheel.engineForce = 0;
+                    wheel.engineForce -= (wheel.engineForce < 0) ? 6 : 2;
+                });
+            }
+            
+            if (!keyCodeDown['KeyW'] && !keyCodeDown['KeyS']) {
+                getFrontWheels().forEach(wheel => {
+                    if(wheel.engineForce > 0)
+                        wheel.engineForce -= 1;
+                    if(wheel.engineForce < 0)
+                        wheel.engineForce += 1;
                 });
             }
     
