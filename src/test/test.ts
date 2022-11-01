@@ -93,7 +93,7 @@ export const Test = (() => {
                     wheel.setBrakeForce((wheel.engineForce > 0) ? 100 : 0);
                 })
                 getFrontWheels().forEach(wheel => {
-                    wheel.engineForce -= (wheel.engineForce < 0) ? 6 : 2;
+                    wheel.engineForce -= (wheel.engineForce > 0) ? 6 : 2;
                 });
             }
             
