@@ -17,7 +17,6 @@ export const Test = (() => {
             getBody,
             getVehicle,
             getFrontWheels,
-            getRearWheels,
             getWheels,
             steerFrontWheels
         } = carBody({
@@ -29,9 +28,9 @@ export const Test = (() => {
             
             maxSteerDegree: 45,
             
-            frontWheelAxle: 15,
-            rearWheelAxle: -15,
-            ackermannAxle: -15
+            frontWheelAxle: 2,
+            rearWheelAxle: -17,
+            ackermannAxle: -17
         });
     
         getVehicle().addToWorld(world);
@@ -44,23 +43,28 @@ export const Test = (() => {
         const vehicleGraph = new PIXI.Graphics();
         vehicleGraph.name = `body::${body.id}`
         vehicleGraph.beginFill(Utils.color.getRandomColor());
-        vehicleGraph.drawPolygon([-10, -20, 10, -20, 10, 20, -10, 20]);
+        vehicleGraph.drawPolygon([
+            [-6, -20],
+            [6, -20],
+            [6, 5],
+            [-6, 5],
+        ].flat(1));
         vehicleGraph.endFill();
     
         
-        const wheelPolygon = [-2, -4, 2, -4, 2, 4, -2, 4];
+        const wheelPolygon = [-1, -2, 1, -2, 1, 2, -1, 2];
         
         const frontLeftWheel = new PIXI.Graphics();
         frontLeftWheel.beginFill(Utils.color.getRandomColor());
         frontLeftWheel.drawPolygon(wheelPolygon);
         frontLeftWheel.endFill();
-        frontLeftWheel.position.set(-10, 15)
+        frontLeftWheel.position.set(-6, 2)
     
         const frontRightWheel = new PIXI.Graphics();
         frontRightWheel.beginFill(Utils.color.getRandomColor());
         frontRightWheel.drawPolygon(wheelPolygon);
         frontRightWheel.endFill();
-        frontRightWheel.position.set(10, 15)
+        frontRightWheel.position.set(6, 2)
     
         vehicleGraph.addChild(frontLeftWheel, frontRightWheel);
     
