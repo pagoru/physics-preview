@@ -4,7 +4,7 @@ await esbuild.build({
     entryPoints: ['src/main.ts'],
     bundle: true,
     outfile: './public/bundle.js',
-    minify: true
+    minify: false
 })
 
 Deno.exit(1)

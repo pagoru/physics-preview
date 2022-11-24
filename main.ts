@@ -75,7 +75,8 @@ serve(
         if (filepath !== '/') {
             try {
                 file = await Deno.open('./public/' + filepath, { read: true });
-            } catch {
+            } catch (e) {
+                console.log(e)
                 // ignore
             }
         }

@@ -4,6 +4,8 @@ import * as P2 from "p2";
 import {carBody} from "test/car-body";
 import * as PIXI from "pixi.mjs";
 import {Utils} from "utils/utils";
+import {SpriteSheetEnum} from "../sprite-sheets/sprite-sheets.enum";
+import {SpriteSheet} from "../sprite-sheets/sprite-sheet";
 
 export const Test = (() => {
 
@@ -138,9 +140,43 @@ export const Test = (() => {
         });
     }
 
-    const start = () => {
-        console.log('?')
+    const start = async () => {
+
         testCar()
+        // testCar()
+
+        // const carContainer = new PIXI.Container();
+        //
+        // const carBodySprite = SpriteSheet.getSpriteSheet(SpriteSheetEnum.CAR_GOLF_GTI_MK1_BODY);
+        // const carTiresSprite = SpriteSheet.getSpriteSheet(SpriteSheetEnum.CAR_GOLF_GTI_MK1_TIRES);
+        //
+        // const animation = '50';
+        //
+        // const animatedSpriteBody = new PIXI.AnimatedSprite(carBodySprite.animations[animation]);
+        // const animatedSpriteTires = new PIXI.AnimatedSprite(carTiresSprite.animations[animation]);
+        // // animatedSpriteTires.play()
+        //
+        // carContainer.addChild(animatedSpriteBody, animatedSpriteTires);
+        // carContainer.pivot.set(196 / 2, 196 / 2)
+        //
+        // const { stage } = Canvas.getApp();
+        // stage.addChild(carContainer)
+        //
+        //
+        // let azimuth = 0;
+        // const getAnimation = (): number => {
+        //     const correctedAzimuth = Math.round(azimuth / 5) * 5 + 5;
+        //     return correctedAzimuth === 365 ? 5 : correctedAzimuth;
+        // }
+        //
+        // Canvas.getApp().ticker.add((delta) => {
+        //
+        //     azimuth += delta * 2;
+        //     if(azimuth >= 360) azimuth = 0;
+        //
+        //     animatedSpriteBody.textures = carBodySprite.animations[getAnimation()]
+        //     animatedSpriteTires.textures = carTiresSprite.animations[getAnimation()]
+        // });
     }
     
     return {
