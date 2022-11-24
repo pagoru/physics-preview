@@ -46,11 +46,20 @@ export const Canvas = (() => {
     const _onResize = () => {
         const { devicePixelRatio } = window;
         const { width, height } = getBounds();
-        
+
         app.renderer.resolution = scale * Math.round(devicePixelRatio);
+        // app.renderer.events.resolution = scale * Math.round(devicePixelRatio);
         // Stage resolution adjustment
         app.renderer.plugins.interaction.resolution = app.renderer.resolution;
+        // PIXI.settings.RENDER_OPTIONS.height = height;
+        // PIXI.settings.RENDER_OPTIONS.width = width;
+        PIXI.settings.RESOLUTION = scale * Math.round(devicePixelRatio);
+        PIXI.settings.FILTER_RESOLUTION = scale * Math.round(devicePixelRatio);
+        PIXI.settings.RENDER_OPTIONS.width = Math.round(width * scale);
+        PIXI.settings.RENDER_OPTIONS.height = Math.round(height * scale);
         app.renderer.resize(width, height);
+
+        console.log(app.renderer)
         
         app.view.style.width = `${Math.round(width * scale)}px`;
         app.view.style.height = `${Math.round(height * scale)}px`;
