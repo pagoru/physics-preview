@@ -90,13 +90,15 @@ export const carBody = (
         if(steerDegree > maxSteerDegree) steerDegree = maxSteerDegree;
         if(steerDegree < - maxSteerDegree) steerDegree = - maxSteerDegree;
     
-        console.log('steerDegree', steerDegree)
+        // console.log('steerDegree', steerDegree)
         const ackermanRadians = getAckermannSteerRadians();
         const radians = getSteerRadians();
     
         frontLeftWheel.steerValue = steerDegree > 0 ? radians : - ackermanRadians
         frontRightWheel.steerValue = steerDegree > 0 ? ackermanRadians : - radians;
     }
+
+    const getSteerDegree = (): number => steerDegree;
     
     const getBody = () => body;
     const getVehicle = () => vehicle;
@@ -105,6 +107,8 @@ export const carBody = (
         getWheels,
         getFrontWheels,
         getRearWheels,
+
+        getSteerDegree,
     
         steerFrontWheels,
     
