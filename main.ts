@@ -1,49 +1,101 @@
+import { serve } from '$deno/http/server.ts';
 
-// Start listening on port 8080 of localhost.
-const server = Deno.listen({ port: 8080 });
+const isDevelopment = Deno.env.get('ENVIRONMENT')! !== 'production';
 
-// Connections to the server will be yielded up as an async iterable.
-for await (const conn of server) {
-    // In order to not be blocking, we need to handle each connection individually
-    // without awaiting the function
-    serveHttp(conn);
-}
+const developmentHotRefresh = await Deno.readTextFile(
+    './development-hot-refresh.js'
+);
+const indexFileText = await Deno.readTextFile('./public/index.html')
 
-async function serveHttp(conn: Deno.Conn) {
-    // This "upgrades" a network connection into an HTTP connection.
-    const httpConn = Deno.serveHttp(conn);
-    // Each request sent over the HTTP connection will be yielded as an async
-    // iterator from the HTTP connection.
-    for await (const requestEvent of httpConn) {
-        try {
-    
-            // The native HTTP server uses the web standard `Request` and `Response`
-            // objects.
-            const { pathname } = new URLPattern(requestEvent.request.url)
-    
-            const githubUrl = `https://raw.githubusercontent.com/pagoru/physics-preview/master/bundle/`;
-    
-            const isProd = Deno.env.get('environment') === 'production';
-            let body;
-            switch (pathname) {
-                case '/':
-                    body = isProd
-                        ? (await (await fetch(`${githubUrl}index.html`)).body)
-                        : Deno.readFileSync('./bundle/index.html')
-                    break;
-                case '/bundle.js':
-                    body = isProd
-                        ? (await (await fetch(`${githubUrl}bundle.js`)).body)
-                        : Deno.readFileSync('./bundle/bundle.js')
-                    break;
-            }
-    
-            if(!body)
-                return await requestEvent.respondWith(new Response('404', { status: 404 }))
-    
-            await requestEvent.respondWith(new Response(body));
-        } catch (e) {
-            
+const DevelopmentFunctions = (() => {
+    if (!isDevelopment) return undefined;
+
+    console.log('>>> DEVELOPMENT MODE <<<');
+
+    let lastChecksum: string | undefined;
+    let socketList: (WebSocket | undefined)[] = [];
+
+    setInterval(async () => {
+        const bundleText = await Deno.readTextFile('./public/bundle.js');
+
+        const data = new TextEncoder().encode(bundleText);
+        const digest = await crypto.subtle.digest('sha-256', data.buffer);
+        const targetChecksum = new TextDecoder().decode(new Uint8Array(digest));
+
+        if (lastChecksum && lastChecksum !== targetChecksum)
+            socketList.forEach(
+                (ws?: WebSocket) =>
+                    ws && ws?.readyState === WebSocket.OPEN && ws?.send('reload')
+            );
+
+        lastChecksum = targetChecksum;
+    }, 100);
+
+    const onRequestWebSocket = (request: Request) => {
+        if (request.headers.get('upgrade') === 'websocket') {
+            const { socket: ws, response } = Deno.upgradeWebSocket(request);
+
+            const indexPos = socketList.push(ws);
+
+            ws.onclose = () => {
+                socketList[indexPos] = undefined;
+            };
+
+            return response;
         }
-    }
-}
+    };
+
+    const onRequestIndex = async (): Promise<Response> => {
+        const indexText = indexFileText.replace(
+            /<!-- SCRIPT_FOOTER -->/,
+            `<script type="text/javascript">\n${developmentHotRefresh}</script>`
+        );
+        return new Response(indexText, {
+            headers: {
+                'content-type': 'text/html',
+            },
+        });
+    };
+
+    return {
+        onRequestWebSocket,
+        onRequestIndex,
+    };
+})();
+
+serve(
+    async (request: Request) => {
+        const webSocketResponse = DevelopmentFunctions?.onRequestWebSocket(request);
+        if (webSocketResponse) return webSocketResponse;
+
+        const url = new URL(request.url);
+        const filepath = url.pathname ? decodeURIComponent(url.pathname) : '';
+
+        let file;
+        if (filepath !== '/') {
+            try {
+                file = await Deno.open('./public/' + filepath, { read: true });
+            } catch {
+                // ignore
+            }
+        }
+
+        if (!file) {
+            if (filepath?.split('/')?.pop()?.includes('.')) {
+                return new Response('404 Not Found', { status: 404 });
+            }
+
+            const devResponse = await DevelopmentFunctions?.onRequestIndex();
+            if (devResponse) return devResponse;
+
+            return new Response(indexFileText, {
+                headers: {
+                    'content-type': 'text/html',
+                },
+            });
+        }
+
+        return new Response(file?.readable);
+    },
+    { port: 8080 }
+);

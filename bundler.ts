@@ -1,8 +1,10 @@
 import * as esbuild from 'esbuild';
 
-esbuild.build({
+await esbuild.build({
     entryPoints: ['src/main.ts'],
     bundle: true,
-    outfile: './bundle/bundle.js',
+    outfile: './public/bundle.js',
     minify: true
 })
+
+Deno.exit(1)
