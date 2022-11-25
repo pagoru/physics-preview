@@ -146,6 +146,8 @@ export const Test = (() => {
         const { stage } = Canvas.getApp();
         const world = World.getWorld();
 
+        const maxSteerDegree = 55;
+
         const {
             getBody,
             getVehicle,
@@ -163,7 +165,7 @@ export const Test = (() => {
             width: 20,
             height: 40,
 
-            maxSteerDegree: 15,
+            maxSteerDegree,
 
             frontWheelAxle: 19,
             rearWheelAxle: 1,
@@ -213,7 +215,7 @@ export const Test = (() => {
 
         vehicleGraph.addChild(frontLeftWheel, frontRightWheel);
 
-        vehicleGraph.visible = false;
+        // vehicleGraph.visible = false;
         stage.addChild(vehicleGraph);
 
         getWheels().forEach(wheel => {
@@ -304,8 +306,8 @@ export const Test = (() => {
         stage.addChild(carContainer)
 
         const getAnimation = (azimuth: number): number => {
-            const correctedAzimuth = Math.round(azimuth / 5) * 5 + 5;
-            console.log('correctedAzimuth', azimuth, correctedAzimuth)
+            const correctedAzimuth = (Math.round(azimuth / 5) * 5) + 5;
+            if(correctedAzimuth === 0) return 360;
             return correctedAzimuth >= 365 ? 5 : correctedAzimuth;
         }
 
@@ -318,17 +320,18 @@ export const Test = (() => {
 
         Canvas.getApp().ticker.add((delta) => {
 
-            const a = Utils.position.getIsometricFromPosition({ x: body.position[0], y: body.position[1] });
-            carContainer.position.set(-a.x, -a.z)
+            const a = Utils.position.getPositionFromIsometricPosition({ x: body.position[0], y: 0, z: body.position[1] });
+            carContainer.position.set(a.x, a.y)
 
-            let b = (body.angle * (180 / Math.PI));
+            let b = (body.angle * (180 / Math.PI)) - 90;
             while(0 > b) b += 360;
             while(b > 360) b -= 360;
 
             setCarAzimuth(b)
             // carContainer.rotation = body.angle;
 
-            const wheelPosition = ((getSteerDegree() + 15) * (15/30));
+            const wheelPosition = Math.floor(((getSteerDegree() + maxSteerDegree) / (maxSteerDegree * 2)) * 15);
+            console.log(wheelPosition)
             animatedSpriteTires.gotoAndStop(wheelPosition);
         });
     }
