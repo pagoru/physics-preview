@@ -6,7 +6,7 @@ import {SpriteSheet} from "../sprite-sheets/sprite-sheet";
 export const Canvas = (() => {
     
     let app: PIXI.Application;
-    const scale = 2;
+    const scale = 3;
     
     const load = async () => {
         

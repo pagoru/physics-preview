@@ -146,7 +146,7 @@ export const Test = (() => {
         const { stage } = Canvas.getApp();
         const world = World.getWorld();
 
-        const maxSteerDegree = 55;
+        const maxSteerDegree = 20;
 
         const {
             getBody,
@@ -160,7 +160,6 @@ export const Test = (() => {
             centerOfMass: 10,
 
             // centerOfMass: 10,
-
 
             width: 20,
             height: 40,
@@ -230,7 +229,9 @@ export const Test = (() => {
             keyCodeDown[code] = false;
         }, false);
 
+        let braking = false;
         Canvas.getApp().ticker.add((delta) => {
+
             if(keyCodeDown['KeyW']) {
                 getWheels().forEach(wheel => {
                     wheel.setBrakeForce((wheel.engineForce < 0) ? 100 : 0);
@@ -267,6 +268,27 @@ export const Test = (() => {
 
             if(keyCodeDown['KeyA']) {
                 steerFrontWheels(-1)
+                const [leftWheel, rightWheel] = getFrontWheels();
+                frontLeftWheel.rotation = leftWheel.steerValue;
+                frontRightWheel.rotation = rightWheel.steerValue;
+            }
+
+            if(keyCodeDown['Space']) {
+                braking = true;
+
+                if(Date.now() % 2 === 0) {
+                    console.log('brake!')
+                    getWheels().forEach(wheel => {
+                        wheel.setBrakeForce(100);
+                    })
+                } else {
+                    console.log('no brake!')
+                }
+            }
+
+            const steerDegree = getSteerDegree();
+            if(!keyCodeDown['KeyD'] && !keyCodeDown['KeyA'] && steerDegree !== 0) {
+                steerFrontWheels(steerDegree > 0 ? -1 : 1)
                 const [leftWheel, rightWheel] = getFrontWheels();
                 frontLeftWheel.rotation = leftWheel.steerValue;
                 frontRightWheel.rotation = rightWheel.steerValue;

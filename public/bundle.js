@@ -27329,7 +27329,7 @@ void main() {
     const start = async () => {
       const { stage } = Canvas.getApp();
       const world = World2.getWorld();
-      const maxSteerDegree = 55;
+      const maxSteerDegree = 20;
       const {
         getBody,
         getVehicle,
@@ -27386,6 +27386,7 @@ void main() {
       window.addEventListener("keyup", ({ code }) => {
         keyCodeDown[code] = false;
       }, false);
+      let braking = false;
       Canvas.getApp().ticker.add((delta) => {
         if (keyCodeDown["KeyW"]) {
           getWheels().forEach((wheel) => {
@@ -27419,6 +27420,24 @@ void main() {
         }
         if (keyCodeDown["KeyA"]) {
           steerFrontWheels(-1);
+          const [leftWheel, rightWheel] = getFrontWheels();
+          frontLeftWheel.rotation = leftWheel.steerValue;
+          frontRightWheel.rotation = rightWheel.steerValue;
+        }
+        if (keyCodeDown["Space"]) {
+          braking = true;
+          if (Date.now() % 2 === 0) {
+            console.log("brake!");
+            getWheels().forEach((wheel) => {
+              wheel.setBrakeForce(100);
+            });
+          } else {
+            console.log("no brake!");
+          }
+        }
+        const steerDegree = getSteerDegree();
+        if (!keyCodeDown["KeyD"] && !keyCodeDown["KeyA"] && steerDegree !== 0) {
+          steerFrontWheels(steerDegree > 0 ? -1 : 1);
           const [leftWheel, rightWheel] = getFrontWheels();
           frontLeftWheel.rotation = leftWheel.steerValue;
           frontRightWheel.rotation = rightWheel.steerValue;
@@ -27476,7 +27495,7 @@ void main() {
   // src/canvas/canvas.ts
   var Canvas = (() => {
     let app;
-    const scale = 2;
+    const scale = 3;
     const load = async () => {
       const { width, height } = getBounds();
       app = new Application({

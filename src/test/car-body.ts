@@ -84,7 +84,7 @@ export const carBody = (
         return Math.atan(axleDistance / ackermanSide);
     }
     
-    const steerFrontWheels = (degree: number) => {
+    const steerFrontWheels = (degree: number, ) => {
         steerDegree += degree;
         
         if(steerDegree > maxSteerDegree) steerDegree = maxSteerDegree;
