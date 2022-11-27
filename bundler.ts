@@ -16,4 +16,4 @@ await esbuild.build({
 
 console.warn(flags.dev)
 
-Deno.exit(1)
+Deno.exit(0)

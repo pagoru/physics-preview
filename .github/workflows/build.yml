@@ -5,7 +5,7 @@ on:
       - 'master'
 jobs:
   deploy:
-    name: 'Deploy'
+    name: 'Build & Deploy'
     runs-on: ubuntu-latest
 
     permissions:
@@ -20,7 +20,7 @@ jobs:
         with:
           deno-version: vx.x.x
 
-      - name: Install modules
+      - name: Build
         run: deno run -A bundler.ts
 
       - name: Deploy to Deno Deploy
