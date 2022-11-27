@@ -13,6 +13,8 @@ export type CarBodyType = {
     rearWheelAxle: number;
     
     ackermannAxle: number;
+
+    wheelSideFriction: [number, number, number, number]
 }
 
 export const carBody = (
@@ -28,7 +30,8 @@ export const carBody = (
         frontWheelAxle,
         rearWheelAxle,
         
-        ackermannAxle
+        ackermannAxle,
+        wheelSideFriction
     }: CarBodyType
 ) => {
 
@@ -45,17 +48,21 @@ export const carBody = (
     const vehicle = new P2.TopDownVehicle(body);
     
     const frontLeftWheel = vehicle.addWheel({
-        localPosition: [-(width / 2), frontWheelAxle]
+        localPosition: [-(width / 2), frontWheelAxle],
+        sideFriction: wheelSideFriction[0],
     });
     const frontRightWheel = vehicle.addWheel({
-        localPosition: [width / 2, frontWheelAxle]
+        localPosition: [width / 2, frontWheelAxle],
+        sideFriction: wheelSideFriction[1],
     });
     
     const rearLeftWheel = vehicle.addWheel({
-        localPosition: [-(width / 2), rearWheelAxle]
+        localPosition: [-(width / 2), rearWheelAxle],
+        sideFriction: wheelSideFriction[2],
     });
     const rearRightWheel = vehicle.addWheel({
-        localPosition: [width / 2, rearWheelAxle]
+        localPosition: [width / 2, rearWheelAxle],
+        sideFriction: wheelSideFriction[3],
     });
     
     const getWheels = () => [

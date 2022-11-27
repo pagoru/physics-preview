@@ -9,135 +9,135 @@ import {SpriteSheet} from "../sprite-sheets/sprite-sheet";
 
 export const Test = (() => {
 
-    const testCar = () => {
-
-        const { stage } = Canvas.getApp();
-        const world = World.getWorld();
-
-        const {
-            getBody,
-            getVehicle,
-            getFrontWheels,
-            getWheels,
-            steerFrontWheels
-        } = carBody({
-            mass: 850,
-            centerOfMass: 10,
-
-            width: 20,
-            height: 40,
-
-            maxSteerDegree: 45,
-
-            frontWheelAxle: 2,
-            rearWheelAxle: -17,
-            ackermannAxle: -17
-        });
-
-        getVehicle().addToWorld(world);
-        const body = getBody();
-        body.allowSleep = false;
-        body.sleepSpeedLimit = 1;
-        body.sleepTimeLimit = 1;
-        world.addBody(body);
-
-        const vehicleGraph = new PIXI.Graphics();
-        vehicleGraph.name = `body::${body.id}`
-        vehicleGraph.beginFill(Utils.color.getRandomColor());
-        vehicleGraph.drawPolygon([
-            [-6, -20],
-            [6, -20],
-            [6, 5],
-            [-6, 5],
-        ].flat(1));
-        vehicleGraph.endFill();
-
-
-        const wheelPolygon = [-1, -2, 1, -2, 1, 2, -1, 2];
-
-        const frontLeftWheel = new PIXI.Graphics();
-        frontLeftWheel.beginFill(Utils.color.getRandomColor());
-        frontLeftWheel.drawPolygon(wheelPolygon);
-        frontLeftWheel.endFill();
-        frontLeftWheel.position.set(-6, 2)
-
-        const frontRightWheel = new PIXI.Graphics();
-        frontRightWheel.beginFill(Utils.color.getRandomColor());
-        frontRightWheel.drawPolygon(wheelPolygon);
-        frontRightWheel.endFill();
-        frontRightWheel.position.set(6, 2)
-
-        vehicleGraph.addChild(frontLeftWheel, frontRightWheel);
-
-        stage.addChild(vehicleGraph);
-
-        getWheels().forEach(wheel => {
-            wheel.setSideFriction(200)
-        })
-
-        const keyCodeDown = {};
-        window.addEventListener('keydown', ({ code }) => {
-            keyCodeDown[code] = true;
-        }, false);
-        window.addEventListener('keyup', ({ code }) => {
-            keyCodeDown[code] = false;
-        }, false);
-
-        Canvas.getApp().ticker.add((delta) => {
-            if(keyCodeDown['KeyW']) {
-                getWheels().forEach(wheel => {
-                    wheel.setBrakeForce((wheel.engineForce < 0) ? 100 : 0);
-                })
-                getFrontWheels().forEach(wheel => {
-                    wheel.engineForce += (wheel.engineForce < 0) ? 6 : 2;
-                });
-            }
-
-            if(keyCodeDown['KeyS']) {
-                getWheels().forEach(wheel => {
-                    wheel.setBrakeForce((wheel.engineForce > 0) ? 100 : 0);
-                })
-                getFrontWheels().forEach(wheel => {
-                    wheel.engineForce -= (wheel.engineForce > 0) ? 6 : 2;
-                });
-            }
-
-            if (!keyCodeDown['KeyW'] && !keyCodeDown['KeyS']) {
-                getFrontWheels().forEach(wheel => {
-                    if(wheel.engineForce > 0)
-                        wheel.engineForce -= 1;
-                    if(wheel.engineForce < 0)
-                        wheel.engineForce += 1;
-                });
-            }
-
-            if(keyCodeDown['KeyD']) {
-                steerFrontWheels(1)
-                const [leftWheel, rightWheel] = getFrontWheels();
-                frontLeftWheel.rotation = leftWheel.steerValue;
-                frontRightWheel.rotation = rightWheel.steerValue;
-            }
-
-            if(keyCodeDown['KeyA']) {
-                steerFrontWheels(-1)
-                const [leftWheel, rightWheel] = getFrontWheels();
-                frontLeftWheel.rotation = leftWheel.steerValue;
-                frontRightWheel.rotation = rightWheel.steerValue;
-            }
-        });
-
-        world.on('postStep', event => {
-            const awakeBodies = world.bodies.filter(
-                body =>
-                    body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
-            );
-            awakeBodies.forEach((body) => {
-                const graphics = stage.getChildByName(`body::${body.id}`);
-                graphics.position.set(body.position[0], body.position[1])
-                graphics.rotation = body.angle;
-            });
-        });
-    }
+    // const testCar = () => {
+    //
+    //     const { stage } = Canvas.getApp();
+    //     const world = World.getWorld();
+    //
+    //     const {
+    //         getBody,
+    //         getVehicle,
+    //         getFrontWheels,
+    //         getWheels,
+    //         steerFrontWheels
+    //     } = carBody({
+    //         mass: 850,
+    //         centerOfMass: 10,
+    //
+    //         width: 20,
+    //         height: 40,
+    //
+    //         maxSteerDegree: 45,
+    //
+    //         frontWheelAxle: 2,
+    //         rearWheelAxle: -17,
+    //         ackermannAxle: -17
+    //     });
+    //
+    //     getVehicle().addToWorld(world);
+    //     const body = getBody();
+    //     body.allowSleep = false;
+    //     body.sleepSpeedLimit = 1;
+    //     body.sleepTimeLimit = 1;
+    //     world.addBody(body);
+    //
+    //     const vehicleGraph = new PIXI.Graphics();
+    //     vehicleGraph.name = `body::${body.id}`
+    //     vehicleGraph.beginFill(Utils.color.getRandomColor());
+    //     vehicleGraph.drawPolygon([
+    //         [-6, -20],
+    //         [6, -20],
+    //         [6, 5],
+    //         [-6, 5],
+    //     ].flat(1));
+    //     vehicleGraph.endFill();
+    //
+    //
+    //     const wheelPolygon = [-1, -2, 1, -2, 1, 2, -1, 2];
+    //
+    //     const frontLeftWheel = new PIXI.Graphics();
+    //     frontLeftWheel.beginFill(Utils.color.getRandomColor());
+    //     frontLeftWheel.drawPolygon(wheelPolygon);
+    //     frontLeftWheel.endFill();
+    //     frontLeftWheel.position.set(-6, 2)
+    //
+    //     const frontRightWheel = new PIXI.Graphics();
+    //     frontRightWheel.beginFill(Utils.color.getRandomColor());
+    //     frontRightWheel.drawPolygon(wheelPolygon);
+    //     frontRightWheel.endFill();
+    //     frontRightWheel.position.set(6, 2)
+    //
+    //     vehicleGraph.addChild(frontLeftWheel, frontRightWheel);
+    //
+    //     stage.addChild(vehicleGraph);
+    //
+    //     getWheels().forEach(wheel => {
+    //         wheel.setSideFriction(200)
+    //     })
+    //
+    //     const keyCodeDown = {};
+    //     window.addEventListener('keydown', ({ code }) => {
+    //         keyCodeDown[code] = true;
+    //     }, false);
+    //     window.addEventListener('keyup', ({ code }) => {
+    //         keyCodeDown[code] = false;
+    //     }, false);
+    //
+    //     Canvas.getApp().ticker.add((delta) => {
+    //         if(keyCodeDown['KeyW']) {
+    //             getWheels().forEach(wheel => {
+    //                 wheel.setBrakeForce((wheel.engineForce < 0) ? 100 : 0);
+    //             })
+    //             getFrontWheels().forEach(wheel => {
+    //                 wheel.engineForce += (wheel.engineForce < 0) ? 6 : 2;
+    //             });
+    //         }
+    //
+    //         if(keyCodeDown['KeyS']) {
+    //             getWheels().forEach(wheel => {
+    //                 wheel.setBrakeForce((wheel.engineForce > 0) ? 100 : 0);
+    //             })
+    //             getFrontWheels().forEach(wheel => {
+    //                 wheel.engineForce -= (wheel.engineForce > 0) ? 6 : 2;
+    //             });
+    //         }
+    //
+    //         if (!keyCodeDown['KeyW'] && !keyCodeDown['KeyS']) {
+    //             getFrontWheels().forEach(wheel => {
+    //                 if(wheel.engineForce > 0)
+    //                     wheel.engineForce -= 1;
+    //                 if(wheel.engineForce < 0)
+    //                     wheel.engineForce += 1;
+    //             });
+    //         }
+    //
+    //         if(keyCodeDown['KeyD']) {
+    //             steerFrontWheels(1)
+    //             const [leftWheel, rightWheel] = getFrontWheels();
+    //             frontLeftWheel.rotation = leftWheel.steerValue;
+    //             frontRightWheel.rotation = rightWheel.steerValue;
+    //         }
+    //
+    //         if(keyCodeDown['KeyA']) {
+    //             steerFrontWheels(-1)
+    //             const [leftWheel, rightWheel] = getFrontWheels();
+    //             frontLeftWheel.rotation = leftWheel.steerValue;
+    //             frontRightWheel.rotation = rightWheel.steerValue;
+    //         }
+    //     });
+    //
+    //     world.on('postStep', event => {
+    //         const awakeBodies = world.bodies.filter(
+    //             body =>
+    //                 body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
+    //         );
+    //         awakeBodies.forEach((body) => {
+    //             const graphics = stage.getChildByName(`body::${body.id}`);
+    //             graphics.position.set(body.position[0], body.position[1])
+    //             graphics.rotation = body.angle;
+    //         });
+    //     });
+    // }
 
     const start = async () => {
 
@@ -146,7 +146,17 @@ export const Test = (() => {
         const { stage } = Canvas.getApp();
         const world = World.getWorld();
 
-        const maxSteerDegree = 20;
+        const width = 20;
+        const height = 40;
+
+        const moveSteeringDegree = .5;
+        const powerSteeringDegree = .25;
+        const maxSteerDegree = 40;
+
+        const centerOfMass = 25;
+        const frontWheelAxle = 34;
+        const rearWheelAxle = 0;
+        const ackermannAxle = 0;
 
         const {
             getBody,
@@ -157,22 +167,18 @@ export const Test = (() => {
             getSteerDegree
         } = carBody({
             mass: 850,
-            centerOfMass: 10,
+            centerOfMass,
 
-            // centerOfMass: 10,
-
-            width: 20,
-            height: 40,
+            width,
+            height,
 
             maxSteerDegree,
 
-            frontWheelAxle: 19,
-            rearWheelAxle: 1,
-            ackermannAxle: 1
+            frontWheelAxle,
+            rearWheelAxle,
+            ackermannAxle,
 
-            // frontWheelAxle: 2,
-            // rearWheelAxle: -17,
-            // ackermannAxle: -17
+            wheelSideFriction: [50, 50, 50, 50]
         });
 
         getVehicle().addToWorld(world);
@@ -182,40 +188,48 @@ export const Test = (() => {
         body.sleepTimeLimit = 1;
         world.addBody(body);
 
+        const vehicleContainer = new PIXI.Container();
+        vehicleContainer.name = `body::${body.id}`
+
         const vehicleGraph = new PIXI.Graphics();
-        vehicleGraph.name = `body::${body.id}`
         vehicleGraph.beginFill(Utils.color.getRandomColor());
-        vehicleGraph.drawPolygon([
-            // [-6, -20],
-            // [6, -20],
-            // [6, 5],
-            // [-6, 5],
-            [-6, -2],
-            [6, -2],
-            [6, 23],
-            [-6, 23],
-        ].flat(1));
+        vehicleGraph.drawShape(new PIXI.Rectangle(0, 0, width, height))
         vehicleGraph.endFill();
+        vehicleGraph.pivot.set(width / 2, ackermannAxle)
+
+        const drawWheel = () => {
+            const wheelGraphics = new PIXI.Graphics();
+            wheelGraphics.beginFill(Utils.color.getRandomColor());
+            wheelGraphics.drawShape(new PIXI.Rectangle(0, 0, 2, 6))
+            wheelGraphics.endFill();
+            return wheelGraphics;
+        }
+
+        const frontLeftWheel = drawWheel();
+        frontLeftWheel.position.set(-(width / 2), frontWheelAxle)
+
+        const frontRightWheel = drawWheel();
+        frontRightWheel.pivot.set(2, 0)
+        frontRightWheel.position.set((width / 2), frontWheelAxle)
+
+        const rearLeftWheel = drawWheel();
+        rearLeftWheel.position.set(-(width / 2), rearWheelAxle)
+
+        const rearRightWheel = drawWheel();
+        rearRightWheel.pivot.set(2, 0)
+        rearRightWheel.position.set((width / 2), rearWheelAxle)
 
 
-        const wheelPolygon = [-1, -2, 1, -2, 1, 2, -1, 2];
+        const gravityCenter = new PIXI.Graphics();
+        gravityCenter.beginFill(Utils.color.getRandomColor());
+        gravityCenter.drawShape(new PIXI.Circle(0, 0, 4))
+        gravityCenter.endFill();
+        gravityCenter.position.set(0, centerOfMass)
 
-        const frontLeftWheel = new PIXI.Graphics();
-        frontLeftWheel.beginFill(Utils.color.getRandomColor());
-        frontLeftWheel.drawPolygon(wheelPolygon);
-        frontLeftWheel.endFill();
-        frontLeftWheel.position.set(-6, 19)
-
-        const frontRightWheel = new PIXI.Graphics();
-        frontRightWheel.beginFill(Utils.color.getRandomColor());
-        frontRightWheel.drawPolygon(wheelPolygon);
-        frontRightWheel.endFill();
-        frontRightWheel.position.set(6, 19)
-
-        vehicleGraph.addChild(frontLeftWheel, frontRightWheel);
+        vehicleContainer.addChild(vehicleGraph, frontLeftWheel, frontRightWheel, rearLeftWheel, rearRightWheel, gravityCenter);
 
         // vehicleGraph.visible = false;
-        stage.addChild(vehicleGraph);
+        stage.addChild(vehicleContainer);
 
         getWheels().forEach(wheel => {
             wheel.setSideFriction(200)
@@ -229,12 +243,12 @@ export const Test = (() => {
             keyCodeDown[code] = false;
         }, false);
 
-        let braking = false;
+        let brakingForce = 0;
         Canvas.getApp().ticker.add((delta) => {
 
             if(keyCodeDown['KeyW']) {
                 getWheels().forEach(wheel => {
-                    wheel.setBrakeForce((wheel.engineForce < 0) ? 100 : 0);
+                    wheel.setBrakeForce(0);
                 })
                 getFrontWheels().forEach(wheel => {
                     wheel.engineForce += 1;
@@ -243,10 +257,11 @@ export const Test = (() => {
 
             if(keyCodeDown['KeyS']) {
                 getWheels().forEach(wheel => {
-                    wheel.setBrakeForce((wheel.engineForce > 0) ? 100 : 0);
+                    wheel.setBrakeForce(0);
                 })
                 getFrontWheels().forEach(wheel => {
                     wheel.engineForce -= 1;
+                    console.log('wheel.engineForce', wheel.engineForce)
                 });
             }
 
@@ -260,35 +275,44 @@ export const Test = (() => {
             }
 
             if(keyCodeDown['KeyD']) {
-                steerFrontWheels(1)
+                steerFrontWheels(moveSteeringDegree)
                 const [leftWheel, rightWheel] = getFrontWheels();
                 frontLeftWheel.rotation = leftWheel.steerValue;
                 frontRightWheel.rotation = rightWheel.steerValue;
             }
 
             if(keyCodeDown['KeyA']) {
-                steerFrontWheels(-1)
+                steerFrontWheels(-moveSteeringDegree)
                 const [leftWheel, rightWheel] = getFrontWheels();
                 frontLeftWheel.rotation = leftWheel.steerValue;
                 frontRightWheel.rotation = rightWheel.steerValue;
             }
 
             if(keyCodeDown['Space']) {
-                braking = true;
+                const isABSReady = Date.now() % 2 === 0;
+                getWheels().forEach(wheel => {
+                    wheel.setBrakeForce(isABSReady ? brakingForce : 0);
+                });
+                brakingForce += 1;
 
-                if(Date.now() % 2 === 0) {
-                    console.log('brake!')
-                    getWheels().forEach(wheel => {
-                        wheel.setBrakeForce(100);
-                    })
-                } else {
-                    console.log('no brake!')
+                if(body.velocity.find(velocity => Math.round(velocity) === 0)) {
+                    getFrontWheels().forEach(wheel => wheel.engineForce = 0);
                 }
+                if(isABSReady) {
+                    getFrontWheels().forEach(wheel => {
+                        if(wheel.engineForce > 0)
+                            wheel.engineForce -= 1;
+                        if(wheel.engineForce < 0)
+                            wheel.engineForce += 1;
+                    });
+                }
+            } else {
+                brakingForce = 200;
             }
 
             const steerDegree = getSteerDegree();
-            if(!keyCodeDown['KeyD'] && !keyCodeDown['KeyA'] && steerDegree !== 0) {
-                steerFrontWheels(steerDegree > 0 ? -1 : 1)
+            if(powerSteeringDegree > 0 && getFrontWheels().find(wheel => Math.round(wheel.engineForce)) && !keyCodeDown['KeyD'] && !keyCodeDown['KeyA'] && steerDegree !== 0) {
+                steerFrontWheels(steerDegree > 0 ? -powerSteeringDegree : powerSteeringDegree)
                 const [leftWheel, rightWheel] = getFrontWheels();
                 frontLeftWheel.rotation = leftWheel.steerValue;
                 frontRightWheel.rotation = rightWheel.steerValue;
@@ -301,9 +325,9 @@ export const Test = (() => {
                     body.type !== P2.Body.STATIC && body.sleepState !== P2.Body.SLEEPING
             );
             awakeBodies.forEach((body) => {
-                const graphics = stage.getChildByName(`body::${body.id}`);
-                graphics.position.set(body.position[0], body.position[1])
-                graphics.rotation = body.angle;
+                const container = stage.getChildByName(`body::${body.id}`);
+                container.position.set(body.position[0], body.position[1])
+                container.rotation = body.angle;
             });
         });
 
@@ -324,6 +348,7 @@ export const Test = (() => {
 
         carContainer.addChild(animatedSpriteBody, animatedSpriteTires);
         carContainer.pivot.set(196 / 2, 196 / 2)
+        // carContainer.visible = false
 
         stage.addChild(carContainer)
 
@@ -350,10 +375,8 @@ export const Test = (() => {
             while(b > 360) b -= 360;
 
             setCarAzimuth(b)
-            // carContainer.rotation = body.angle;
 
             const wheelPosition = Math.floor(((getSteerDegree() + maxSteerDegree) / (maxSteerDegree * 2)) * 15);
-            console.log(wheelPosition)
             animatedSpriteTires.gotoAndStop(wheelPosition);
         });
     }

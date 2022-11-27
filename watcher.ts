@@ -1,5 +1,5 @@
 const process = Deno.run({
-	cmd: ['deno', 'run', '-A', 'bundler.ts'],
+	cmd: ['deno', 'run', '-A', 'bundler.ts', '--dev'],
 	stdout: 'piped',
 	stderr: 'piped',
 });
