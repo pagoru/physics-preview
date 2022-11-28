@@ -24270,14 +24270,14 @@ ${e}`);
     const start = async () => {
       const { stage } = Canvas.getApp();
       const world = World2.getWorld();
-      const width = 20;
-      const height = 40;
+      const width = 12;
+      const height = 28;
       const moveSteeringDegree = 0.5;
       const powerSteeringDegree = 0.25;
       const maxSteerDegree = 40;
-      const centerOfMass = 25;
-      const frontWheelAxle = 34;
-      const rearWheelAxle = 0;
+      const centerOfMass = 12;
+      const frontWheelAxle = 22;
+      const rearWheelAxle = 6;
       const ackermannAxle = 0;
       const {
         getBody,
@@ -24315,17 +24315,16 @@ ${e}`);
         wheelGraphics.beginFill(Utils.color.getRandomColor());
         wheelGraphics.drawShape(new Rectangle(0, 0, 2, 6));
         wheelGraphics.endFill();
+        wheelGraphics.pivot.set(1, 3);
         return wheelGraphics;
       };
       const frontLeftWheel = drawWheel();
       frontLeftWheel.position.set(-(width / 2), frontWheelAxle);
       const frontRightWheel = drawWheel();
-      frontRightWheel.pivot.set(2, 0);
       frontRightWheel.position.set(width / 2, frontWheelAxle);
       const rearLeftWheel = drawWheel();
       rearLeftWheel.position.set(-(width / 2), rearWheelAxle);
       const rearRightWheel = drawWheel();
-      rearRightWheel.pivot.set(2, 0);
       rearRightWheel.position.set(width / 2, rearWheelAxle);
       const gravityCenter = new Graphics();
       gravityCenter.beginFill(Utils.color.getRandomColor());
@@ -24346,6 +24345,7 @@ ${e}`);
       }, false);
       let brakingForce = 0;
       Canvas.getApp().ticker.add((delta) => {
+        console.log("delta", delta);
         if (keyCodeDown["KeyW"]) {
           getWheels().forEach((wheel) => {
             wheel.setBrakeForce(0);
@@ -24462,7 +24462,7 @@ ${e}`);
   // src/canvas/canvas.ts
   var Canvas = (() => {
     let app;
-    const scale = 1;
+    const scale = 3;
     const load = async () => {
       const { width, height } = getBounds();
       app = new Application({

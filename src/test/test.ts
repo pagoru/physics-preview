@@ -146,16 +146,16 @@ export const Test = (() => {
         const { stage } = Canvas.getApp();
         const world = World.getWorld();
 
-        const width = 20;
-        const height = 40;
+        const width = 12;
+        const height = 28;
 
         const moveSteeringDegree = .5;
         const powerSteeringDegree = .25;
         const maxSteerDegree = 40;
 
-        const centerOfMass = 25;
-        const frontWheelAxle = 34;
-        const rearWheelAxle = 0;
+        const centerOfMass = 12;
+        const frontWheelAxle = 22;
+        const rearWheelAxle = 6;
         const ackermannAxle = 0;
 
         const {
@@ -202,6 +202,7 @@ export const Test = (() => {
             wheelGraphics.beginFill(Utils.color.getRandomColor());
             wheelGraphics.drawShape(new PIXI.Rectangle(0, 0, 2, 6))
             wheelGraphics.endFill();
+            wheelGraphics.pivot.set(1, 3);
             return wheelGraphics;
         }
 
@@ -209,14 +210,12 @@ export const Test = (() => {
         frontLeftWheel.position.set(-(width / 2), frontWheelAxle)
 
         const frontRightWheel = drawWheel();
-        frontRightWheel.pivot.set(2, 0)
         frontRightWheel.position.set((width / 2), frontWheelAxle)
 
         const rearLeftWheel = drawWheel();
         rearLeftWheel.position.set(-(width / 2), rearWheelAxle)
 
         const rearRightWheel = drawWheel();
-        rearRightWheel.pivot.set(2, 0)
         rearRightWheel.position.set((width / 2), rearWheelAxle)
 
 
@@ -245,6 +244,8 @@ export const Test = (() => {
 
         let brakingForce = 0;
         Canvas.getApp().ticker.add((delta) => {
+
+            console.log('delta', delta)
 
             if(keyCodeDown['KeyW']) {
                 getWheels().forEach(wheel => {

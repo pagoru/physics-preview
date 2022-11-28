@@ -7,7 +7,7 @@ const connect = () => {
 	console.debug('Connecting to Local development server...');
 
 	try {
-		let ws = new WebSocket('ws://localhost:8080');
+		let ws = new WebSocket('ws://localhost:9090');
 		ws.onmessage = m => handleMessage(ws, m.data);
 		ws.onopen = () => {
 			console.debug('Connected to Local development server!');
